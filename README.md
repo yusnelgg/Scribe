@@ -16,7 +16,7 @@ Scribe is a CLI tool that analyzes your backend codebase and automatically gener
 - Zero configuration required
 - Static code analysis (no AI required by default)
 - Multi-provider AI enhancement (Ollama, OpenAI, Claude, OpenCode Zen)
-- Support for multiple frameworks (Gin, Echo, Fiber)
+- Support for multiple frameworks (Gin, Echo, Fiber, Express)
 - Config file support for API keys (secure, gitignored)
 - GitHub Actions integration ready
 - Clean, idiomatic Go code
@@ -63,8 +63,10 @@ After scanning, you'll find:
 ├── openapi.json    # OpenAPI 3.0 specification
 ├── report.md       # Analysis report
 └── tests/          # Test templates
-    ├── test_get_users.go
+    ├── test_get_users.go         # Go (Gin/Echo/Fiber)
+    ├── test_get_users.test.js    # JavaScript (Express)
     ├── test_post_users.go
+    ├── test_post_users.test.js
     └── ...
 ```
 
@@ -179,11 +181,19 @@ ai:
 
 ## GitHub Actions
 
-Scribe includes a CI workflow (`.github/workflows/ci.yml`) that:
-- Runs tests on push/PR
-- Builds the binary
-- Lints with golangci-lint
-- Generates documentation on push to main/dev
+Scribe includes CI workflows:
+
+- **ci.yml** - Runs tests on push/PR, builds binary, lints, generates docs
+- **release.yml** - Creates releases with multi-platform binaries
+
+### Requirements for Tests
+
+**Go projects:** No extra dependencies needed
+
+**Express/Node.js projects:** Install Jest and supertest:
+```bash
+npm install --save-dev jest supertest
+```
 
 ## Contributing
 
