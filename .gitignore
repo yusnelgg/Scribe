@@ -27,9 +27,11 @@ openapi.json
 report.md
 tests/
 *_generated.go
+*.test.js
 
 # Sample projects
 sample_project/
+sample_express/
 
 # Scribe config (contains sensitive keys)
 .scribe.yaml

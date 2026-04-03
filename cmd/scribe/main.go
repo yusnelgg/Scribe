@@ -14,7 +14,7 @@ import (
 
 func main() {
 	path := flag.String("path", ".", "Path to the Go project to scan")
-	framework := flag.String("framework", "gin", "Web framework to scan (gin, echo, fiber)")
+	framework := flag.String("framework", "gin", "Web framework to scan (gin, echo, fiber, express)")
 	enableAI := flag.Bool("ai", false, "Enable AI-powered enhancements")
 	aiProvider := flag.String("ai-provider", "ollama", "AI provider (ollama, openai, anthropic)")
 	aiEndpoint := flag.String("ai-endpoint", "http://localhost:11434", "AI provider endpoint")
@@ -57,6 +57,7 @@ func main() {
 		fmt.Printf("Framework: %s\n", *framework)
 		fmt.Printf("AI enabled: %v\n", *enableAI)
 		fmt.Printf("AI provider: %s\n", provider)
+		fmt.Printf("Output dir: %s\n", *outputDir)
 		if apiKey != "" {
 			fmt.Printf("AI API key: configured\n")
 		}
@@ -74,14 +75,26 @@ func main() {
 	}
 
 	s := scanner.New()
-	files, err := s.Scan(absPath)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error scanning project: %v\n", err)
-		os.Exit(1)
-	}
 
-	if *verbose {
-		fmt.Printf("Found %d Go files\n", len(files))
+	var files []string
+	if *framework == "express" {
+		files, err = s.ScanWithExtension(absPath, ".js")
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error scanning project: %v\n", err)
+			os.Exit(1)
+		}
+		if *verbose {
+			fmt.Printf("Found %d JS files\n", len(files))
+		}
+	} else {
+		files, err = s.Scan(absPath)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error scanning project: %v\n", err)
+			os.Exit(1)
+		}
+		if *verbose {
+			fmt.Printf("Found %d Go files\n", len(files))
+		}
 	}
 
 	var p parser.Parser
@@ -90,6 +103,8 @@ func main() {
 		p = parser.NewEchoParser()
 	case "fiber":
 		p = parser.NewFiberParser()
+	case "express":
+		p = parser.NewExpressParser()
 	default:
 		p = parser.NewGinParser()
 	}
@@ -116,6 +131,7 @@ func main() {
 		AIEndpoint: endpoint,
 		AIModel:    model,
 		AIAPIKey:   apiKey,
+		Framework:  *framework,
 	})
 
 	if *verbose {

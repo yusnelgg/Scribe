@@ -38,11 +38,14 @@ Download from [Releases](https://github.com/yusnelgg/scribe/releases) for your p
 ## Quick Start
 
 ```bash
-# Scan current directory
+# Scan Go project (default: Gin)
 scribe scan .
 
 # Scan specific project
 scribe scan ./my-api
+
+# Scan Node.js/Express project (must specify framework)
+scribe scan ./my-express-app -framework express
 
 # With verbose output
 scribe scan . -v
@@ -70,7 +73,7 @@ After scanning, you'll find:
 | Flag | Description | Default |
 |------|-------------|---------|
 | `-path` | Project path to scan | `.` |
-| `-framework` | Web framework (gin, echo, fiber) | `gin` |
+| `-framework` | Web framework (gin, echo, fiber, express) | `gin` |
 | `-ai` | Enable AI enhancement | `false` |
 | `-ai-provider` | AI provider (ollama, openai, claude, opencode) | `ollama` |
 | `-ai-endpoint` | AI endpoint URL | `http://localhost:11434` |
@@ -98,7 +101,7 @@ scribe/
 - [x] Echo (Go)
 - [x] Fiber (Go)
 - [ ] Chi (Go)
-- [ ] Express (Node.js)
+- [x] Express (Node.js)
 - [ ] FastAPI (Python)
 
 ## AI Integration

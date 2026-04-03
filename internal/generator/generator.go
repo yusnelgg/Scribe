@@ -21,19 +21,27 @@ type Options struct {
 	AIEndpoint string
 	AIModel    string
 	AIAPIKey   string
+	Framework  string
 }
 
 type Generator struct {
 	opts      Options
 	aiClient  ai.AIClient
 	enhancer  *ai.Enhancer
-	formatter *formatter.Formatter
+	formatter interface {
+		FormatTest(route parser.Route) string
+	}
 }
 
 func New(opts Options) *Generator {
 	g := &Generator{
-		opts:      opts,
-		formatter: formatter.New(),
+		opts: opts,
+	}
+
+	if opts.Framework == "express" {
+		g.formatter = formatter.NewExpressFormatter()
+	} else {
+		g.formatter = formatter.New()
 	}
 
 	if opts.AIEnabled {
@@ -135,7 +143,12 @@ func (g *Generator) generateTests(routes []parser.Route) error {
 			content = g.formatter.FormatTest(route)
 		}
 
-		filename := fmt.Sprintf("test_%s_%s_generated.go", strings.ToLower(route.Method), sanitizeFilename(route.Path))
+		var filename string
+		if g.opts.Framework == "express" {
+			filename = fmt.Sprintf("test_%s_%s.test.js", strings.ToLower(route.Method), sanitizeFilename(route.Path))
+		} else {
+			filename = fmt.Sprintf("test_%s_%s_generated.go", strings.ToLower(route.Method), sanitizeFilename(route.Path))
+		}
 		outputPath := filepath.Join(absTestsDir, filename)
 
 		if err := os.WriteFile(outputPath, []byte(content), 0644); err != nil {
