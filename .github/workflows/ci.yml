@@ -15,6 +15,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  GO_VERSION: '1.21'
+
 jobs:
   test:
     name: Test
@@ -26,7 +29,8 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: ${{ env.GO_VERSION }}
+          cache: false
 
       - name: Run tests
         run: go test -v ./...
@@ -42,7 +46,8 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: ${{ env.GO_VERSION }}
+          cache: false
 
       - name: Build
         run: go build -o scribe ./cmd/scribe
@@ -64,7 +69,8 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: ${{ env.GO_VERSION }}
+          cache: false
 
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6
@@ -87,7 +93,8 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: ${{ env.GO_VERSION }}
+          cache: false
 
       - name: Build scribe
         run: go build -o scribe ./cmd/scribe
