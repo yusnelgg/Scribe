@@ -101,6 +101,10 @@ scribe/
 
 Scribe supports optional AI enhancement. By default, it works purely through static analysis.
 
+When AI is enabled, Scribe:
+- **Enhances tests** - Generates comprehensive tests with proper setup, mocks, and assertions
+- **Improves OpenAPI specs** - Adds descriptions, summaries, and request/response schemas
+
 ### Ollama (Local, Recommended)
 
 ```bash
