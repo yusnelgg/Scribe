@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/yusnelgg/scribe/internal/config"
 	"github.com/yusnelgg/scribe/internal/generator"
 	"github.com/yusnelgg/scribe/internal/parser"
 	"github.com/yusnelgg/scribe/internal/scanner"
@@ -17,15 +18,48 @@ func main() {
 	enableAI := flag.Bool("ai", false, "Enable AI-powered enhancements")
 	aiProvider := flag.String("ai-provider", "ollama", "AI provider (ollama, openai, anthropic)")
 	aiEndpoint := flag.String("ai-endpoint", "http://localhost:11434", "AI provider endpoint")
+	aiModel := flag.String("ai-model", "", "AI model (optional, overrides config)")
+	aiKey := flag.String("ai-key", "", "AI API key (optional, overrides config/env)")
 	outputDir := flag.String("output", ".", "Output directory for generated files")
 	verbose := flag.Bool("v", false, "Verbose output")
 
 	flag.Parse()
 
+	cfg, err := config.LoadDefault()
+	if err != nil {
+		if *verbose {
+			fmt.Fprintf(os.Stderr, "Warning: could not load config: %v\n", err)
+		}
+	}
+
+	provider := *aiProvider
+	endpoint := *aiEndpoint
+	model := *aiModel
+	apiKey := *aiKey
+
+	if cfg != nil {
+		if provider == "ollama" && cfg.GetAIProvider() != "ollama" {
+			provider = cfg.GetAIProvider()
+		}
+		if endpoint == "http://localhost:11434" && cfg.GetAIEndpoint() != "http://localhost:11434" {
+			endpoint = cfg.GetAIEndpoint()
+		}
+		if model == "" {
+			model = cfg.GetAIModel()
+		}
+		if apiKey == "" {
+			apiKey = cfg.GetAIAPIKey()
+		}
+	}
+
 	if *verbose {
 		fmt.Printf("Scanning project at: %s\n", *path)
 		fmt.Printf("Framework: %s\n", *framework)
 		fmt.Printf("AI enabled: %v\n", *enableAI)
+		fmt.Printf("AI provider: %s\n", provider)
+		if apiKey != "" {
+			fmt.Printf("AI API key: configured\n")
+		}
 	}
 
 	absPath, err := filepath.Abs(*path)
@@ -70,8 +104,10 @@ func main() {
 	g := generator.New(generator.Options{
 		OutputDir:  *outputDir,
 		AIEnabled:  *enableAI,
-		AIProvider: *aiProvider,
-		AIEndpoint: *aiEndpoint,
+		AIProvider: provider,
+		AIEndpoint: endpoint,
+		AIModel:    model,
+		AIAPIKey:   apiKey,
 	})
 
 	if err := g.Generate(routes, absPath); err != nil {

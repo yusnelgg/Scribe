@@ -14,39 +14,55 @@ type AIClient interface {
 }
 
 func NewClient(provider, endpoint string) AIClient {
+	return NewClientWithConfig(provider, endpoint, "", "")
+}
+
+func NewClientWithConfig(provider, endpoint, model, apiKey string) AIClient {
 	switch provider {
 	case "ollama":
-		return &OllamaClient{
-			endpoint: endpoint,
-			model:    "llama2",
-			client:   &http.Client{},
-		}
-	case "openai":
-		model := os.Getenv("OPENAI_MODEL")
 		if model == "" {
-			model = "gpt-4o-mini"
+			model = "llama2"
 		}
-		return &OpenAIClient{
+		return &OllamaClient{
 			endpoint: endpoint,
 			model:    model,
 			client:   &http.Client{},
 		}
+	case "openai":
+		if model == "" {
+			model = "gpt-4o-mini"
+		}
+		if apiKey == "" {
+			apiKey = os.Getenv("OPENAI_API_KEY")
+		}
+		return &OpenAIClient{
+			endpoint: endpoint,
+			model:    model,
+			apiKey:   apiKey,
+			client:   &http.Client{},
+		}
 	case "claude":
-		model := os.Getenv("CLAUDE_MODEL")
 		if model == "" {
 			model = "claude-sonnet-4-20250514"
 		}
+		if apiKey == "" {
+			apiKey = os.Getenv("ANTHROPIC_API_KEY")
+		}
 		return &ClaudeClient{
 			model:  model,
+			apiKey: apiKey,
 			client: &http.Client{},
 		}
 	case "opencode":
-		model := os.Getenv("OPENCODE_MODEL")
 		if model == "" {
 			model = "qwen3-8b"
 		}
+		if apiKey == "" {
+			apiKey = os.Getenv("OPENCODE_API_KEY")
+		}
 		return &OpenCodeClient{
 			model:  model,
+			apiKey: apiKey,
 			client: &http.Client{},
 		}
 	default:

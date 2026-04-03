@@ -26,6 +26,10 @@ Thumbs.db
 openapi.json
 report.md
 tests/
+*_generated.go
 
 # Sample projects
 sample_project/
+
+# Scribe config (contains sensitive keys)
+.scribe.yaml

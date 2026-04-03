@@ -19,6 +19,8 @@ type Options struct {
 	AIEnabled  bool
 	AIProvider string
 	AIEndpoint string
+	AIModel    string
+	AIAPIKey   string
 }
 
 type Generator struct {
@@ -35,7 +37,7 @@ func New(opts Options) *Generator {
 	}
 
 	if opts.AIEnabled {
-		g.aiClient = ai.NewClient(opts.AIProvider, opts.AIEndpoint)
+		g.aiClient = ai.NewClientWithConfig(opts.AIProvider, opts.AIEndpoint, opts.AIModel, opts.AIAPIKey)
 		g.enhancer = ai.NewEnhancer(g.aiClient)
 	}
 
@@ -131,7 +133,7 @@ func (g *Generator) generateTests(routes []parser.Route) error {
 			content = g.formatter.FormatTest(route)
 		}
 
-		filename := fmt.Sprintf("test_%s_%s.go", strings.ToLower(route.Method), sanitizeFilename(route.Path))
+		filename := fmt.Sprintf("test_%s_%s_generated.go", strings.ToLower(route.Method), sanitizeFilename(route.Path))
 		outputPath := filepath.Join(testsDir, filename)
 
 		if err := os.WriteFile(outputPath, []byte(content), 0644); err != nil {

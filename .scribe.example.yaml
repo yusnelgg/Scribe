@@ -1,0 +1,9 @@
+# Ejemplo de configuración de Scribe
+# Copia este archivo como .scribe.yaml y agrega tu API key
+# IMPORTANTE: Este archivo NO debe subirse al repositorio (ya está en .gitignore)
+
+ai:
+  provider: openai  # ollama, openai, claude, opencode
+  api_key: ""       # Tu API key aquí
+  endpoint: ""      # Opcional: endpoint personalizado
+  model: ""         # Opcional: modelo específico
