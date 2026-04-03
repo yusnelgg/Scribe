@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   test:
     name: Test
@@ -66,7 +71,7 @@ jobs:
     name: Generate Documentation
     runs-on: ubuntu-latest
     needs: build
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -80,7 +85,9 @@ jobs:
         run: go build -o scribe ./cmd/scribe
 
       - name: Generate documentation
-        run: ./scribe scan . -output ./docs
+        run: |
+          mkdir -p docs
+          ./scribe scan . -output ./docs
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
