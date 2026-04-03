@@ -40,6 +40,15 @@ func NewClient(provider, endpoint string) AIClient {
 			model:  model,
 			client: &http.Client{},
 		}
+	case "opencode":
+		model := os.Getenv("OPENCODE_MODEL")
+		if model == "" {
+			model = "qwen3-8b"
+		}
+		return &OpenCodeClient{
+			model:  model,
+			client: &http.Client{},
+		}
 	default:
 		return &MockClient{}
 	}
@@ -250,6 +259,82 @@ func (c *ClaudeClient) GenerateWithSystem(systemPrompt, userPrompt string) (stri
 	}
 
 	return result.Content[0].Text, nil
+}
+
+type OpenCodeClient struct {
+	model  string
+	apiKey string
+	client *http.Client
+}
+
+func (c *OpenCodeClient) Generate(prompt string) (string, error) {
+	return c.GenerateWithSystem("", prompt)
+}
+
+func (c *OpenCodeClient) GenerateWithSystem(systemPrompt, userPrompt string) (string, error) {
+	url := "https://opencode.ai/api/chat/completions"
+
+	apiKey := os.Getenv("OPENCODE_API_KEY")
+	if apiKey == "" {
+		return "", fmt.Errorf("OPENCODE_API_KEY environment variable is required")
+	}
+
+	messages := []map[string]string{}
+	if systemPrompt != "" {
+		messages = append(messages, map[string]string{
+			"role":    "system",
+			"content": systemPrompt,
+		})
+	}
+	messages = append(messages, map[string]string{
+		"role":    "user",
+		"content": userPrompt,
+	})
+
+	requestBody := map[string]interface{}{
+		"model":    c.model,
+		"messages": messages,
+	}
+
+	jsonBody, err := json.Marshal(requestBody)
+	if err != nil {
+		return "", err
+	}
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonBody))
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+apiKey)
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("failed to call OpenCode: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("OpenCode returned status %d", resp.StatusCode)
+	}
+
+	var result struct {
+		Choices []struct {
+			Message struct {
+				Content string `json:"content"`
+			} `json:"message"`
+		} `json:"choices"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return "", err
+	}
+
+	if len(result.Choices) == 0 {
+		return "", fmt.Errorf("no response from OpenCode")
+	}
+
+	return result.Choices[0].Message.Content, nil
 }
 
 type MockClient struct{}

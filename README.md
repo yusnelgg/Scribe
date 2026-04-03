@@ -15,7 +15,7 @@ Scribe is a CLI tool that analyzes your backend codebase and automatically gener
 
 - Zero configuration required
 - Static code analysis (no AI required by default)
-- Multi-provider AI enhancement (Ollama, OpenAI, Claude)
+- Multi-provider AI enhancement (Ollama, OpenAI, Claude, OpenCode Zen)
 - Focus on Gin framework (extensible architecture)
 - Clean, idiomatic Go code
 
@@ -45,7 +45,7 @@ scribe scan ./my-api
 # With verbose output
 scribe scan . -v
 
-# Enable AI enhancement (requires Ollama, OpenAI, or Claude)
+# Enable AI enhancement (requires Ollama, OpenAI, Claude, or OpenCode)
 scribe scan . -ai
 ```
 
@@ -70,7 +70,7 @@ After scanning, you'll find:
 | `-path` | Project path to scan | `.` |
 | `-framework` | Web framework (gin) | `gin` |
 | `-ai` | Enable AI enhancement | `false` |
-| `-ai-provider` | AI provider (ollama, openai, claude) | `ollama` |
+| `-ai-provider` | AI provider (ollama, openai, claude, opencode) | `ollama` |
 | `-ai-endpoint` | AI endpoint URL | `http://localhost:11434` |
 | `-output` | Output directory | `.` |
 | `-v` | Verbose output | `false` |
@@ -141,6 +141,18 @@ export ANTHROPIC_API_KEY=sk-ant-...
 export CLAUDE_MODEL=claude-opus-4-5
 
 scribe scan . -ai -ai-provider=claude
+```
+
+### OpenCode (Zen)
+
+```bash
+# Set your API key
+export OPENCODE_API_KEY=your-api-key
+
+# Optional: specify model (defaults to qwen3-8b)
+export OPENCODE_MODEL=qwen3-32b
+
+scribe scan . -ai -ai-provider=opencode
 ```
 
 ## Contributing
