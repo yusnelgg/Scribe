@@ -24,6 +24,7 @@ type Options struct {
 type Generator struct {
 	opts      Options
 	aiClient  ai.AIClient
+	enhancer  *ai.Enhancer
 	formatter *formatter.Formatter
 }
 
@@ -35,6 +36,7 @@ func New(opts Options) *Generator {
 
 	if opts.AIEnabled {
 		g.aiClient = ai.NewClient(opts.AIProvider, opts.AIEndpoint)
+		g.enhancer = ai.NewEnhancer(g.aiClient)
 	}
 
 	return g
@@ -78,7 +80,7 @@ func (g *Generator) generateOpenAPI(routes []parser.Route) error {
 		}
 
 		method := strings.ToLower(route.Method)
-		paths[route.Path][method] = map[string]interface{}{
+		pathSpec := map[string]interface{}{
 			"summary":     fmt.Sprintf("%s %s", route.Method, route.Path),
 			"operationId": fmt.Sprintf("%s%s", method, sanitizeOperationID(route.Path)),
 			"responses": map[string]interface{}{
@@ -87,6 +89,21 @@ func (g *Generator) generateOpenAPI(routes []parser.Route) error {
 				},
 			},
 		}
+
+		if g.enhancer != nil && route.Handler != "anonymous" {
+			if code, err := ai.ReadHandlerCode(route.FilePath, route.Handler); err == nil {
+				if enhancement, err := g.enhancer.EnhanceOpenAPI(route, code); err == nil {
+					if enhancement.Summary != "" {
+						pathSpec["summary"] = enhancement.Summary
+					}
+					if enhancement.Description != "" {
+						pathSpec["description"] = enhancement.Description
+					}
+				}
+			}
+		}
+
+		paths[route.Path][method] = pathSpec
 	}
 
 	outputPath := filepath.Join(g.opts.OutputDir, "openapi.json")
@@ -100,7 +117,20 @@ func (g *Generator) generateTests(routes []parser.Route) error {
 	}
 
 	for _, route := range routes {
-		content := g.formatter.FormatTest(route)
+		var content string
+
+		if g.enhancer != nil && route.Handler != "anonymous" {
+			if code, err := ai.ReadHandlerCode(route.FilePath, route.Handler); err == nil {
+				if enhancement, err := g.enhancer.EnhanceTest(route, code); err == nil {
+					content = enhancement.TestBody
+				}
+			}
+		}
+
+		if content == "" {
+			content = g.formatter.FormatTest(route)
+		}
+
 		filename := fmt.Sprintf("test_%s_%s.go", strings.ToLower(route.Method), sanitizeFilename(route.Path))
 		outputPath := filepath.Join(testsDir, filename)
 
@@ -119,6 +149,7 @@ func (g *Generator) generateReport(routes []parser.Route, projectPath string) er
 	buf.WriteString(fmt.Sprintf("Generated: %s\n\n", time.Now().Format(time.RFC1123)))
 	buf.WriteString("## Summary\n\n")
 	buf.WriteString(fmt.Sprintf("- **Total Routes**: %d\n", len(routes)))
+	buf.WriteString(fmt.Sprintf("- **AI Enhanced**: %v\n", g.opts.AIEnabled))
 	buf.WriteString(fmt.Sprintf("- **Project Path**: %s\n\n", projectPath))
 
 	methodCount := make(map[string]int)
