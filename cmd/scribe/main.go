@@ -6,9 +6,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/autoback/autoback/internal/generator"
-	"github.com/autoback/autoback/internal/parser"
-	"github.com/autoback/autoback/internal/scanner"
+	"github.com/yusnel/mt-scribe/internal/generator"
+	"github.com/yusnel/mt-scribe/internal/parser"
+	"github.com/yusnel/mt-scribe/internal/scanner"
 )
 
 func main() {

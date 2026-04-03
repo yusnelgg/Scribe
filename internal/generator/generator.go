@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/autoback/autoback/internal/ai"
-	"github.com/autoback/autoback/internal/formatter"
-	"github.com/autoback/autoback/internal/parser"
+	"github.com/yusnel/mt-scribe/internal/ai"
+	"github.com/yusnel/mt-scribe/internal/formatter"
+	"github.com/yusnel/mt-scribe/internal/parser"
 )
 
 type Options struct {
@@ -115,7 +115,7 @@ func (g *Generator) generateTests(routes []parser.Route) error {
 func (g *Generator) generateReport(routes []parser.Route, projectPath string) error {
 	var buf bytes.Buffer
 
-	buf.WriteString("# Autoback Analysis Report\n\n")
+	buf.WriteString("# Scribe Analysis Report\n\n")
 	buf.WriteString(fmt.Sprintf("Generated: %s\n\n", time.Now().Format(time.RFC1123)))
 	buf.WriteString("## Summary\n\n")
 	buf.WriteString(fmt.Sprintf("- **Total Routes**: %d\n", len(routes)))

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/autoback/autoback/internal/parser"
+	"github.com/yusnel/mt-scribe/internal/parser"
 )
 
 type Formatter struct{}
