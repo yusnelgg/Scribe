@@ -15,7 +15,7 @@ Scribe is a CLI tool that analyzes your backend codebase and automatically gener
 
 - Zero configuration required
 - Static code analysis (no AI required by default)
-- Pluggable AI enhancement (optional Ollama/OpenAI support)
+- Multi-provider AI enhancement (Ollama, OpenAI, Claude)
 - Focus on Gin framework (extensible architecture)
 - Clean, idiomatic Go code
 
@@ -45,7 +45,7 @@ scribe scan ./my-api
 # With verbose output
 scribe scan . -v
 
-# Enable AI enhancement (requires Ollama)
+# Enable AI enhancement (requires Ollama, OpenAI, or Claude)
 scribe scan . -ai
 ```
 
@@ -70,7 +70,7 @@ After scanning, you'll find:
 | `-path` | Project path to scan | `.` |
 | `-framework` | Web framework (gin) | `gin` |
 | `-ai` | Enable AI enhancement | `false` |
-| `-ai-provider` | AI provider (ollama) | `ollama` |
+| `-ai-provider` | AI provider (ollama, openai, claude) | `ollama` |
 | `-ai-endpoint` | AI endpoint URL | `http://localhost:11434` |
 | `-output` | Output directory | `.` |
 | `-v` | Verbose output | `false` |
@@ -105,7 +105,7 @@ When AI is enabled, Scribe:
 - **Enhances tests** - Generates comprehensive tests with proper setup, mocks, and assertions
 - **Improves OpenAPI specs** - Adds descriptions, summaries, and request/response schemas
 
-### Ollama (Local, Recommended)
+### Ollama (Local, Free)
 
 ```bash
 # Install Ollama
@@ -115,15 +115,32 @@ curl -fsSL https://ollama.com/install.sh | sh  # Linux
 # Start Ollama
 ollama serve
 
-# Use with scribe
+# Use with scribe (default provider)
 scribe scan . -ai
 ```
 
 ### OpenAI
 
 ```bash
-export OPENAI_API_KEY=your-key
+# Set your API key
+export OPENAI_API_KEY=sk-...
+
+# Optional: specify model (defaults to gpt-4o-mini)
+export OPENAI_MODEL=gpt-4o
+
 scribe scan . -ai -ai-provider=openai
+```
+
+### Claude (Anthropic)
+
+```bash
+# Set your API key
+export ANTHROPIC_API_KEY=sk-ant-...
+
+# Optional: specify model (defaults to claude-sonnet-4-20250514)
+export CLAUDE_MODEL=claude-opus-4-5
+
+scribe scan . -ai -ai-provider=claude
 ```
 
 ## Contributing
