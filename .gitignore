@@ -26,3 +26,6 @@ Thumbs.db
 openapi.json
 report.md
 tests/
+
+# Sample projects
+sample_project/
