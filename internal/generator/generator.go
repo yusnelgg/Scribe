@@ -109,12 +109,14 @@ func (g *Generator) generateOpenAPI(routes []parser.Route) error {
 	}
 
 	outputPath := filepath.Join(g.opts.OutputDir, "openapi.json")
-	return writeJSON(outputPath, openapi)
+	absOutputPath, _ := filepath.Abs(outputPath)
+	return writeJSON(absOutputPath, openapi)
 }
 
 func (g *Generator) generateTests(routes []parser.Route) error {
 	testsDir := filepath.Join(g.opts.OutputDir, "tests")
-	if err := os.MkdirAll(testsDir, 0755); err != nil {
+	absTestsDir, _ := filepath.Abs(testsDir)
+	if err := os.MkdirAll(absTestsDir, 0755); err != nil {
 		return err
 	}
 
@@ -134,7 +136,7 @@ func (g *Generator) generateTests(routes []parser.Route) error {
 		}
 
 		filename := fmt.Sprintf("test_%s_%s_generated.go", strings.ToLower(route.Method), sanitizeFilename(route.Path))
-		outputPath := filepath.Join(testsDir, filename)
+		outputPath := filepath.Join(absTestsDir, filename)
 
 		if err := os.WriteFile(outputPath, []byte(content), 0644); err != nil {
 			return err
@@ -177,7 +179,8 @@ func (g *Generator) generateReport(routes []parser.Route, projectPath string) er
 	}
 
 	outputPath := filepath.Join(g.opts.OutputDir, "report.md")
-	return os.WriteFile(outputPath, buf.Bytes(), 0644)
+	absOutputPath, _ := filepath.Abs(outputPath)
+	return os.WriteFile(absOutputPath, buf.Bytes(), 0644)
 }
 
 func writeJSON(path string, data interface{}) error {

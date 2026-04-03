@@ -16,7 +16,9 @@ Scribe is a CLI tool that analyzes your backend codebase and automatically gener
 - Zero configuration required
 - Static code analysis (no AI required by default)
 - Multi-provider AI enhancement (Ollama, OpenAI, Claude, OpenCode Zen)
-- Focus on Gin framework (extensible architecture)
+- Support for multiple frameworks (Gin, Echo, Fiber)
+- Config file support for API keys (secure, gitignored)
+- GitHub Actions integration ready
 - Clean, idiomatic Go code
 
 ## Installation
@@ -68,10 +70,12 @@ After scanning, you'll find:
 | Flag | Description | Default |
 |------|-------------|---------|
 | `-path` | Project path to scan | `.` |
-| `-framework` | Web framework (gin) | `gin` |
+| `-framework` | Web framework (gin, echo, fiber) | `gin` |
 | `-ai` | Enable AI enhancement | `false` |
 | `-ai-provider` | AI provider (ollama, openai, claude, opencode) | `ollama` |
 | `-ai-endpoint` | AI endpoint URL | `http://localhost:11434` |
+| `-ai-model` | AI model (optional, overrides config) | provider default |
+| `-ai-key` | AI API key (optional, overrides config/env) | - |
 | `-output` | Output directory | `.` |
 | `-v` | Verbose output | `false` |
 
@@ -91,8 +95,8 @@ scribe/
 ## Supported Frameworks
 
 - [x] Gin (Go)
-- [ ] Echo (Go)
-- [ ] Fiber (Go)
+- [x] Echo (Go)
+- [x] Fiber (Go)
 - [ ] Chi (Go)
 - [ ] Express (Node.js)
 - [ ] FastAPI (Python)
@@ -154,6 +158,29 @@ export OPENCODE_MODEL=qwen3-32b
 
 scribe scan . -ai -ai-provider=opencode
 ```
+
+## Configuration File
+
+Scribe supports a config file (`.scribe.yaml`) to store your AI settings securely:
+
+```yaml
+# .scribe.yaml (add to .gitignore)
+ai:
+  provider: openai
+  api_key: "your-api-key-here"
+  endpoint: ""      # optional custom endpoint
+  model: ""         # optional custom model
+```
+
+**Priority order:** CLI flag > config file > environment variable
+
+## GitHub Actions
+
+Scribe includes a CI workflow (`.github/workflows/ci.yml`) that:
+- Runs tests on push/PR
+- Builds the binary
+- Lints with golangci-lint
+- Generates documentation on push to main/dev
 
 ## Contributing
 

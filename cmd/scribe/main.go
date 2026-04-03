@@ -14,7 +14,7 @@ import (
 
 func main() {
 	path := flag.String("path", ".", "Path to the Go project to scan")
-	framework := flag.String("framework", "gin", "Web framework to scan (default: gin)")
+	framework := flag.String("framework", "gin", "Web framework to scan (gin, echo, fiber)")
 	enableAI := flag.Bool("ai", false, "Enable AI-powered enhancements")
 	aiProvider := flag.String("ai-provider", "ollama", "AI provider (ollama, openai, anthropic)")
 	aiEndpoint := flag.String("ai-endpoint", "http://localhost:11434", "AI provider endpoint")
@@ -84,7 +84,15 @@ func main() {
 		fmt.Printf("Found %d Go files\n", len(files))
 	}
 
-	p := parser.NewGinParser()
+	var p parser.Parser
+	switch *framework {
+	case "echo":
+		p = parser.NewEchoParser()
+	case "fiber":
+		p = parser.NewFiberParser()
+	default:
+		p = parser.NewGinParser()
+	}
 	var routes []parser.Route
 	for _, file := range files {
 		r, err := p.Parse(file)
@@ -109,6 +117,11 @@ func main() {
 		AIModel:    model,
 		AIAPIKey:   apiKey,
 	})
+
+	if *verbose {
+		fmt.Printf("Output directory: %s\n", *outputDir)
+		fmt.Printf("Generating files...\n")
+	}
 
 	if err := g.Generate(routes, absPath); err != nil {
 		fmt.Fprintf(os.Stderr, "Error generating files: %v\n", err)
