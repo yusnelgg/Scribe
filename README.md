@@ -24,14 +24,14 @@ Scribe is a CLI tool that analyzes your backend codebase and automatically gener
 ### From Source
 
 ```bash
-git clone https://github.com/yusnel/mt-scribe.git
+git clone https://github.com/yusnelgg/scribe.git
 cd scribe
 go install
 ```
 
 ### Pre-built Binaries
 
-Download from [Releases](https://github.com/yusnel/mt-scribe/releases) for your platform.
+Download from [Releases](https://github.com/yusnelgg/scribe/releases) for your platform.
 
 ## Quick Start
 

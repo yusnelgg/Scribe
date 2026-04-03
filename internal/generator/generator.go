@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yusnel/mt-scribe/internal/ai"
-	"github.com/yusnel/mt-scribe/internal/formatter"
-	"github.com/yusnel/mt-scribe/internal/parser"
+	"github.com/yusnelgg/scribe/internal/ai"
+	"github.com/yusnelgg/scribe/internal/formatter"
+	"github.com/yusnelgg/scribe/internal/parser"
 )
 
 type Options struct {

@@ -1,3 +1,3 @@
-module github.com/yusnel/mt-scribe
+module github.com/yusnelgg/scribe
 
 go 1.25.4

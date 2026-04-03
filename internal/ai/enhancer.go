@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yusnel/mt-scribe/internal/parser"
+	"github.com/yusnelgg/scribe/internal/parser"
 )
 
 type Enhancer struct {
